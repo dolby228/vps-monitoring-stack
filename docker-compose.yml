@@ -2,17 +2,24 @@ services:
   node-exporter:
     image: prom/node-exporter
     container_name: node-exporter
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - '/:/host:ro,rslave'
     ports:
       - "127.0.0.1:9100:9100"
 
   prometheus:
     image: prom/prometheus
     container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.size=512MB'
     ports:
       - "127.0.0.1:9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-
+      - prometheus-data:/prometheus
   grafana:
     image: grafana/grafana
     container_name: grafana
@@ -25,3 +32,4 @@ services:
 
 volumes:
   grafana-data:
+  prometheus-data:
